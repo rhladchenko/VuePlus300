@@ -12,8 +12,20 @@
     <ul>
       <li v-for="(id, index) in userIds" :key="index">
         <router-link :to="{name: 'ViewProfile', params: {user_id: id}}">
-            <span>{{ id }}</span>
+          <span>Profile {{ id }}</span>
         </router-link>
+      </li>
+    </ul>
+    <h2>Navigations Controls</h2>
+    <ul>
+      <li>
+        <button @click="goBack">Go Back</button>
+      </li>
+      <li>
+        <button @click="goHome">Redirect to Home</button>
+      </li>
+      <li>
+        <button @click="goForward">Go Forward</button>
       </li>
     </ul>
   </nav>
@@ -26,6 +38,17 @@ export default {
     return {
       userIds: ["1", "2", "3", "4"]
     };
+  },
+  methods: {
+    goHome() {
+      this.$router.push({ name: "Home" });
+    },
+    goBack(){
+      this.$router.go(-1)
+    },
+    goForward(){
+      this.$router.go(+1)
+    }
   }
 };
 </script>
@@ -38,5 +61,10 @@ ul {
 
 a {
   color: #42b983;
+}
+
+li {
+  display: inline-block;
+  margin: 10px;
 }
 </style>
