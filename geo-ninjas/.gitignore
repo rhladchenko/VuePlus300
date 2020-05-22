@@ -1,7 +1,7 @@
 .DS_Store
 node_modules/
 /dist/
-src/components/firebase/
+src/firebase/
 index.html
 
 npm-debug.log*
