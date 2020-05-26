@@ -24,8 +24,10 @@
 
 <script>
 import slugify from "slugify";
-import db from '@/firebase/init'
-import firebase from 'firebase'
+import db from "@/firebase/init";
+import firebase from "firebase";
+import functions from "firebase/functions";
+
 export default {
   name: "Signup",
   data() {
@@ -45,30 +47,31 @@ export default {
           remove: /[$*_+~.()'"!\-:@]/g,
           lower: true
         });
-        let ref = db.collection('users').doc(this.slug)
-        ref.get().then(doc => {
-            if(doc.exists){
-                this.feedback = "This alias already exists"
-            } else {
-              firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
+        let checkAlias = firebase.functions().httpsCallable("checkAlias");
+        checkAlias({ slug: this.slug }).then(result => {
+          if (!result.data.unique) {
+            this.feedback = "This alias already exists";
+          } else {
+            firebase
+              .auth()
+              .createUserWithEmailAndPassword(this.email, this.password)
               .then(cred => {
-                ref.set({
+                db.collection('users').doc(this.slug).set({
                   alias: this.alias,
                   geolocation: null,
                   user_id: cred.user.uid
-                })
-              }).then(() => {
-                this.$router.push({name: 'GMap'})
+                });
+              })
+              .then(() => {
+                this.$router.push({ name: "GMap" });
               })
               .catch(err => {
-                console.log(err); 
-                this.feedback = err.message               
-              })
-                this.feedback = "This alies is free to use"
-            }
-        })
-        
-        this.feedback = null;
+                console.log(err);
+                this.feedback = err.message;
+              });
+            this.feedback = "This alies is free to use";
+          }
+        });
       } else {
         this.feedback = "You must enter all fields";
       }
